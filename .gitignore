@@ -127,3 +127,12 @@ nllb-200-distilled-600M-ctranslate2/*
 *.mp3
 
 .idea/
+
+# WhisperLiveKit directory (installed as dependency)
+whisperlivekit/
+
+# Old files from restructuring
+pyproject_old.toml
+README_old.md
+streamlit_interface.py
+jfk.flac
