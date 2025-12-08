@@ -413,6 +413,12 @@ if st.session_state.show_expert_mode:
 # ---------------------------
 # Command Builder
 # ---------------------------
+def add_if_set(cmd, flag, value):
+    """Only add flag and value to cmd if value is not empty/None."""
+    if value not in ("", None):
+        cmd.extend([flag, str(value)])
+
+
 def build_command():
     cmd = [sys.executable, "-m", "improved_wlk_ui.server"]
     cmd.extend(["--host", expert_defaults["host"]])
@@ -461,9 +467,9 @@ def build_command():
 
     if enable_diarization:
         cmd.append("--diarization")
-        cmd.extend(["--diarization-backend", expert_defaults["diarization_backend"]])
-        cmd.extend(["--segmentation-model", expert_defaults["segmentation_model"]])
-        cmd.extend(["--embedding-model", expert_defaults["embedding_model"]])
+        add_if_set(cmd, "--diarization-backend", expert_defaults["diarization_backend"])
+        add_if_set(cmd, "--segmentation-model", expert_defaults["segmentation_model"])
+        add_if_set(cmd, "--embedding-model", expert_defaults["embedding_model"])
 
     flags = [
         "confidence_validation",
@@ -479,20 +485,20 @@ def build_command():
         if expert_defaults[f]:
             cmd.append(f"--{f. replace('_', '-')}")
 
-    cmd.extend(["--frame-threshold", str(expert_defaults["frame_threshold"])])
-    cmd.extend(["--beams", str(expert_defaults["beams"])])
-    if expert_defaults["decoder_type"] != "auto":
+    add_if_set(cmd, "--frame-threshold", expert_defaults["frame_threshold"])
+    add_if_set(cmd, "--beams", expert_defaults["beams"])
+    if expert_defaults["decoder_type"] not in ("auto", ""):
         cmd.extend(["--decoder", expert_defaults["decoder_type"]])
-    cmd.extend(["--audio-max-len", str(expert_defaults["audio_max_len"])])
-    cmd.extend(["--audio-min-len", str(expert_defaults["audio_min_len"])])
+    add_if_set(cmd, "--audio-max-len", expert_defaults["audio_max_len"])
+    add_if_set(cmd, "--audio-min-len", expert_defaults["audio_min_len"])
     if expert_defaults["max_context_tokens"] > 0:
         cmd.extend(["--max-context-tokens", str(expert_defaults["max_context_tokens"])])
-    cmd.extend(["--nllb-backend", expert_defaults["nllb_backend"]])
-    cmd.extend(["--nllb-size", expert_defaults["nllb_size"]])
-    cmd.extend(["--min-chunk-size", str(expert_defaults["min_chunk_size"])])
-    cmd.extend(["--vac-chunk-size", str(expert_defaults["vac_chunk_size"])])
-    cmd.extend(["--buffer_trimming", expert_defaults["buffer_trimming"]])
-    cmd.extend(["--buffer_trimming_sec", str(expert_defaults["buffer_trimming_sec"])])
+    add_if_set(cmd, "--nllb-backend", expert_defaults["nllb_backend"])
+    add_if_set(cmd, "--nllb-size", expert_defaults["nllb_size"])
+    add_if_set(cmd, "--min-chunk-size", expert_defaults["min_chunk_size"])
+    add_if_set(cmd, "--vac-chunk-size", expert_defaults["vac_chunk_size"])
+    add_if_set(cmd, "--buffer_trimming", expert_defaults["buffer_trimming"])
+    add_if_set(cmd, "--buffer_trimming_sec", expert_defaults["buffer_trimming_sec"])
 
     return cmd
 
