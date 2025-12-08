@@ -439,7 +439,7 @@ def build_command():
         "OpenAI Whisper": "whisper",
         "OpenAI API": "openai-api",
     }
-    cmd.extend(["--backend", backend_map. get(backend, "auto")])
+    cmd.extend(["--backend", backend_map.get(backend, "auto")])
 
     optional_strings = [
         ("--ssl-certfile", expert_defaults["ssl_certfile"]),
@@ -483,7 +483,7 @@ def build_command():
     ]
     for f in flags:
         if expert_defaults[f]:
-            cmd.append(f"--{f. replace('_', '-')}")
+            cmd.append(f"--{f.replace('_', '-')}")
 
     add_if_set(cmd, "--frame-threshold", expert_defaults["frame_threshold"])
     add_if_set(cmd, "--beams", expert_defaults["beams"])
