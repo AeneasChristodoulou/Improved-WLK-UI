@@ -21,21 +21,21 @@ st.set_page_config(page_title="WhisperLiveKit", page_icon="🎙️", layout="cen
 # ---------------------------
 # Session State Initialization
 # ---------------------------
-if "server_process" not in st. session_state:
+if "server_process" not in st.session_state:
     st.session_state.server_process = None
-if "server_running" not in st. session_state:
+if "server_running" not in st.session_state:
     st.session_state.server_running = False
 if "show_expert_mode" not in st.session_state:
     st.session_state.show_expert_mode = False
-if "server_port" not in st. session_state:
+if "server_port" not in st.session_state:
     st.session_state.server_port = 8000
 if "server_url" not in st.session_state:
     st.session_state.server_url = None
 if "server_logs" not in st.session_state:
     st.session_state.server_logs = []
 if "log_queue" not in st.session_state:
-    st. session_state.log_queue = queue. Queue()
-if "server_pid" not in st. session_state:
+    st.session_state.log_queue = queue.Queue()
+if "server_pid" not in st.session_state:
     st.session_state.server_pid = None
 
 # ---------------------------
@@ -112,11 +112,11 @@ st.header("⚙️ Configuration")
 
 # Model Selection
 model_index = 5  # default to "large-v3-turbo"
-model_size = st. selectbox(
+model_size = st.selectbox(
     "Model",
     MODEL_LIST,
     index=model_index,
-    help="Larger models are more accurate but slower.  'base' is recommended for most users.",
+    help="Larger models are more accurate but slower. 'base' is recommended for most users.",
 )
 
 # Language Selection
@@ -137,7 +137,7 @@ with col1:
         "Translate speech in real-time", value=False, help="Enable translation"
     )
 with col2:
-    enable_diarization = st. checkbox(
+    enable_diarization = st.checkbox(
         "Speaker Detection",
         value=True,
         help="Identify different speakers (requires additional setup)",
@@ -171,7 +171,7 @@ with st.expander("🔧 Advanced Options"):
 # Translation Menu
 # ---------------------------
 st.subheader("🌐 Translation")
-translation_mode = st. selectbox(
+translation_mode = st.selectbox(
     "Translation Mode",
     ["Off", "Translate to English", "Translate to Specific Language"],
     index=0,
@@ -201,7 +201,7 @@ if st.button(
     "⚠️ Expert Mode - Only if you know what you're doing!", use_container_width=True
 ):
     st.session_state.show_expert_mode = not st.session_state.show_expert_mode
-    st. rerun()
+    st.rerun()
 
 # Default Expert Values
 expert_defaults = {
@@ -214,7 +214,7 @@ expert_defaults = {
     "model_cache_dir": "",
     "model_dir": "",
     "lora_path": "",
-    "warmup_file": "jfk. flac",
+    "warmup_file": "jfk.flac",
     "buffer_trimming": "segment",
     "buffer_trimming_sec": 15.0,
     "confidence_validation": False,
@@ -260,7 +260,7 @@ if st.session_state.show_expert_mode:
             st.info(f"Port: {port} (set above)")
         with col3:
             log_level_options = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-            expert_defaults["log_level"] = st. selectbox(
+            expert_defaults["log_level"] = st.selectbox(
                 "Log Level", log_level_options, index=1
             )
         col1, col2 = st.columns(2)
@@ -290,11 +290,11 @@ if st.session_state.show_expert_mode:
         col1, col2 = st.columns(2)
         with col1:
             buffer_options = ["segment", "sentence"]
-            expert_defaults["buffer_trimming"] = st. selectbox(
+            expert_defaults["buffer_trimming"] = st.selectbox(
                 "Buffer Trimming Strategy", buffer_options, index=0
             )
         with col2:
-            expert_defaults["buffer_trimming_sec"] = st. slider(
+            expert_defaults["buffer_trimming_sec"] = st.slider(
                 "Buffer Trimming Threshold (sec)",
                 1.0,
                 30.0,
@@ -342,7 +342,7 @@ if st.session_state.show_expert_mode:
                 )
 
     with st.expander("🎵 Audio & Streaming", expanded=False):
-        col1, col2 = st. columns(2)
+        col1, col2 = st.columns(2)
         with col1:
             expert_defaults["min_chunk_size"] = st.slider(
                 "Min Chunk Size (sec)",
@@ -361,10 +361,10 @@ if st.session_state.show_expert_mode:
             )
         col1, col2, col3 = st.columns(3)
         with col1:
-            expert_defaults["frame_threshold"] = st. number_input(
+            expert_defaults["frame_threshold"] = st.number_input(
                 "Frame Threshold", value=expert_defaults["frame_threshold"], min_value=1
             )
-            expert_defaults["beams"] = st. number_input(
+            expert_defaults["beams"] = st.number_input(
                 "Beams", value=expert_defaults["beams"], min_value=1
             )
             decoder_options = ["auto", "beam", "greedy"]
@@ -404,8 +404,8 @@ if st.session_state.show_expert_mode:
                 "NLLB Backend", nllb_backend_options, index=0
             )
         with col2:
-            nllb_size_options = ["600M", "1. 3B"]
-            expert_defaults["nllb_size"] = st. selectbox(
+            nllb_size_options = ["600M", "1.3B"]
+            expert_defaults["nllb_size"] = st.selectbox(
                 "NLLB Size", nllb_size_options, index=0
             )
 
@@ -452,7 +452,7 @@ def build_command():
     ]
     for flag, val in optional_strings:
         if val:
-            cmd. extend([flag, val])
+            cmd.extend([flag, val])
 
     if translate_to_english:
         cmd.append("--direct-english-translation")
@@ -463,7 +463,7 @@ def build_command():
         cmd.append("--diarization")
         cmd.extend(["--diarization-backend", expert_defaults["diarization_backend"]])
         cmd.extend(["--segmentation-model", expert_defaults["segmentation_model"]])
-        cmd. extend(["--embedding-model", expert_defaults["embedding_model"]])
+        cmd.extend(["--embedding-model", expert_defaults["embedding_model"]])
 
     flags = [
         "confidence_validation",
@@ -488,11 +488,11 @@ def build_command():
     if expert_defaults["max_context_tokens"] > 0:
         cmd.extend(["--max-context-tokens", str(expert_defaults["max_context_tokens"])])
     cmd.extend(["--nllb-backend", expert_defaults["nllb_backend"]])
-    cmd. extend(["--nllb-size", expert_defaults["nllb_size"]])
+    cmd.extend(["--nllb-size", expert_defaults["nllb_size"]])
     cmd.extend(["--min-chunk-size", str(expert_defaults["min_chunk_size"])])
     cmd.extend(["--vac-chunk-size", str(expert_defaults["vac_chunk_size"])])
     cmd.extend(["--buffer_trimming", expert_defaults["buffer_trimming"]])
-    cmd. extend(["--buffer_trimming_sec", str(expert_defaults["buffer_trimming_sec"])])
+    cmd.extend(["--buffer_trimming_sec", str(expert_defaults["buffer_trimming_sec"])])
 
     return cmd
 
@@ -505,7 +505,7 @@ def read_output(process, log_queue):
     try:
         for line in iter(process.stdout. readline, ""):
             if line:
-                log_queue.put(line. strip())
+                log_queue.put(line.strip())
             if process.poll() is not None:
                 break
     except Exception:
@@ -528,7 +528,7 @@ def kill_process_tree(pid):
             pass
     else:
         try:
-            os.killpg(os.getpgid(pid), signal. SIGTERM)
+            os.killpg(os.getpgid(pid), signal.SIGTERM)
         except Exception:
             pass
         try:
@@ -559,7 +559,7 @@ def kill_port(port_num):
             pass
     else:
         try:
-            subprocess. run(
+            subprocess.run(
                 ["fuser", "-k", f"{port_num}/tcp"], capture_output=True, timeout=10
             )
         except Exception:
@@ -572,7 +572,7 @@ def kill_port(port_num):
                 )
                 for pid in result.stdout. strip().split("\n"):
                     if pid.isdigit():
-                        os.kill(int(pid), signal. SIGKILL)
+                        os.kill(int(pid), signal.SIGKILL)
             except Exception:
                 pass
 
@@ -586,20 +586,20 @@ def start_server():
 
     st.session_state.server_logs = []
 
-    log_queue = queue. Queue()
+    log_queue = queue.Queue()
     st.session_state. log_queue = log_queue
 
     if os.name != "nt":
         process = subprocess.Popen(
             cmd,
-            stdout=subprocess. PIPE,
+            stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
             preexec_fn=os.setsid,
         )
     else:
-        process = subprocess. Popen(
+        process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -654,7 +654,7 @@ def stop_server():
 
     st.session_state.server_process = None
     st.session_state.server_pid = None
-    st. session_state.server_running = False
+    st.session_state.server_running = False
     st.session_state.server_url = None
     st.session_state.server_logs = []
 
@@ -665,7 +665,7 @@ def get_new_logs():
     """Get any new logs from the queue."""
     new_logs = []
     try:
-        while not st.session_state.log_queue. empty():
+        while not st.session_state.log_queue.empty():
             line = st.session_state.log_queue.get_nowait()
             new_logs.append(line)
             st.session_state. server_logs.append(line)
@@ -695,7 +695,7 @@ if not st.session_state.server_running:
 
         st.info("🔄 Starting server...  This may take a while for large models.")
         log_placeholder = st.empty()
-        status_placeholder = st. empty()
+        status_placeholder = st.empty()
 
         server_ready = False
         start_time = time. time()
@@ -709,7 +709,7 @@ if not st.session_state.server_running:
                     line = log_queue.get_nowait()
                     st.session_state. server_logs.append(line)
 
-                    recent_logs = st. session_state.server_logs[-15:]
+                    recent_logs = st.session_state.server_logs[-15:]
                     log_placeholder.code("\n".join(recent_logs), language="text")
 
                     if (
@@ -719,7 +719,7 @@ if not st.session_state.server_running:
                         server_ready = True
                         if "http://" in line:
                             start_idx = line.find("http://")
-                            end_idx = line. find(" ", start_idx)
+                            end_idx = line.find(" ", start_idx)
                             if end_idx == -1:
                                 end_idx = len(line)
                             st.session_state.server_url = line[
@@ -748,14 +748,14 @@ if not st.session_state.server_running:
             st.session_state.server_url = f"http://localhost:{port}"
 
         status_placeholder.empty()
-        st. success("✅ Server started successfully!")
+        st.success("✅ Server started successfully!")
         time.sleep(1)
         st.rerun()
 
 else:
     url = st.session_state.server_url
     st.success("✅ Server is running!")
-    st. markdown("### 🌐 Open the transcription interface:")
+    st.markdown("### 🌐 Open the transcription interface:")
     st.markdown(f"**[{url}]({url})**")
 
     col1, col2 = st.columns(2)
@@ -763,7 +763,7 @@ else:
         if st.button("🔗 Open in Browser", use_container_width=True):
             webbrowser.open(url)
     with col2:
-        if st. button("⏹️ Stop Server", type="secondary", use_container_width=True):
+        if st.button("⏹️ Stop Server", type="secondary", use_container_width=True):
             with st.spinner("Stopping server..."):
                 stopped = stop_server()
                 time.sleep(1)
@@ -775,8 +775,8 @@ else:
         get_new_logs()
 
         if st.session_state.server_logs:
-            recent_logs = st. session_state.server_logs[-50:]
-            st. code("\n".join(recent_logs), language="text")
+            recent_logs = st.session_state.server_logs[-50:]
+            st.code("\n".join(recent_logs), language="text")
         else:
             st.info("No logs available yet.")
 
