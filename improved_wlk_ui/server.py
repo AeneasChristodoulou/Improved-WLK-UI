@@ -13,12 +13,10 @@ from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 
 from whisperlivekit import (
     AudioProcessor,
     TranscriptionEngine,
-    get_inline_ui_html,
     parse_args,
 )
 
@@ -55,28 +53,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount custom web assets
-web_dir = Path(__file__).parent / "web"
-app.mount("/custom", StaticFiles(directory=str(web_dir)), name="custom")
-
 
 @app.get("/")
 async def get():
     """Serve the enhanced UI with speaker name management."""
-    # Get the base HTML from WhisperLiveKit
-    base_html = get_inline_ui_html()
+    web_dir = Path(__file__).parent / "web"
+    html_file = web_dir / "live_transcription.html"
     
-    # Inject our custom CSS and JS
-    custom_css = '<link rel="stylesheet" href="/custom/custom_styles.css" />'
-    custom_js = '<script src="/custom/custom_scripts.js"></script>'
+    with open(html_file, "r", encoding="utf-8") as f:
+        html_content = f.read()
     
-    # Insert custom CSS before </head>
-    html = base_html.replace("</head>", f"{custom_css}\n</head>")
+    return HTMLResponse(html_content)
+
+
+@app.get("/web/{file_path:path}")
+async def serve_web_assets(file_path: str):
+    """Serve web assets (CSS, JS, images, etc.)."""
+    web_dir = Path(__file__).parent / "web"
+    file = web_dir / file_path
     
-    # Insert custom JS before </body>
-    html = html.replace("</body>", f"{custom_js}\n</body>")
+    if file.exists() and file.is_file():
+        return FileResponse(file)
     
-    return HTMLResponse(html)
+    # If not found in our web dir, return 404
+    return HTMLResponse(content="Not Found", status_code=404)
 
 
 # Speaker Name API Endpoints

@@ -34,4 +34,4 @@ where = ["."]
 include = ["improved_wlk_ui*"]
 
 [tool.setuptools.package-data]
-improved_wlk_ui = ["web/*.css", "web/*.js", "*.flac"]
+improved_wlk_ui = ["web/*.html", "web/*.css", "web/*.js", "web/src/*.svg", "*.flac"]
