@@ -59,11 +59,12 @@ async def get():
     """Serve the enhanced UI with speaker name management."""
     web_dir = Path(__file__).parent / "web"
     html_file = web_dir / "live_transcription.html"
-    
+
     with open(html_file, "r", encoding="utf-8") as f:
         html_content = f.read()
-    
+
     return HTMLResponse(html_content)
+
 
 # Speaker Name API Endpoints
 @app.get("/api/speakers")
@@ -92,6 +93,7 @@ async def clear_all_speaker_names():
     speaker_names.clear()
     return {"success": True}
 
+
 @app.get("/{file_path:path}")
 async def serve_web_assets(file_path: str):
     """Serve web assets (CSS, JS, images, etc.)."""
@@ -116,9 +118,7 @@ async def handle_websocket_results(websocket, results_generator):
                 if speaker_id and speaker_id > 0:
                     line["speaker_name"] = speaker_names.get_name(speaker_id)
             await websocket.send_json(response_dict)
-        logger.info(
-            "Results generator finished. Sending 'ready_to_stop' to client."
-        )
+        logger.info("Results generator finished. Sending 'ready_to_stop' to client.")
         await websocket.send_json({"type": "ready_to_stop"})
     except WebSocketDisconnect:
         logger.info(
@@ -162,9 +162,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 f"Unexpected KeyError in websocket_endpoint: {e}", exc_info=True
             )
     except WebSocketDisconnect:
-        logger.info(
-            "WebSocket disconnected by client during message receiving loop."
-        )
+        logger.info("WebSocket disconnected by client during message receiving loop.")
     except Exception as e:
         logger.error(
             f"Unexpected error in websocket_endpoint main loop: {e}",
@@ -179,9 +177,7 @@ async def websocket_endpoint(websocket: WebSocket):
         except asyncio.CancelledError:
             logger.info("WebSocket results handler task was cancelled.")
         except Exception as e:
-            logger.warning(
-                f"Exception while awaiting websocket_task completion: {e}"
-            )
+            logger.warning(f"Exception while awaiting websocket_task completion: {e}")
 
         await audio_processor.cleanup()
         logger.info("WebSocket endpoint cleaned up successfully.")

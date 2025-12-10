@@ -214,7 +214,7 @@ expert_defaults = {
     "model_cache_dir": "",
     "model_dir": "",
     "lora_path": "",
-    "warmup_file": "", # TODO: currently none, should be either the standard jfk.wav or alternatively a custom warmup file tailored to our/your needs (your needs if you are a github user reading this, if so, welcome!)
+    "warmup_file": "",  # TODO: currently none, should be either the standard jfk.wav or alternatively a custom warmup file tailored to our/your needs (your needs if you are a github user reading this, if so, welcome!)
     "buffer_trimming": "segment",
     "buffer_trimming_sec": "",
     "confidence_validation": False,
@@ -401,9 +401,7 @@ if st.session_state.show_expert_mode:
                 "Decoder Type", decoder_options, index=0
             )
         with col2:
-            audio_max_len_default = to_float(
-                expert_defaults.get("audio_max_len"), 30.0
-            )
+            audio_max_len_default = to_float(expert_defaults.get("audio_max_len"), 30.0)
             expert_defaults["audio_max_len"] = st.slider(
                 "Audio Max Length (sec)",
                 1.0,
@@ -411,9 +409,7 @@ if st.session_state.show_expert_mode:
                 audio_max_len_default,
                 1.0,
             )
-            audio_min_len_default = to_float(
-                expert_defaults.get("audio_min_len"), 0.0
-            )
+            audio_min_len_default = to_float(expert_defaults.get("audio_min_len"), 0.0)
             expert_defaults["audio_min_len"] = st.slider(
                 "Audio Min Length (sec)",
                 0.0,
@@ -443,6 +439,7 @@ if st.session_state.show_expert_mode:
             expert_defaults["nllb_size"] = st.selectbox(
                 "NLLB Size", nllb_size_options, index=0
             )
+
 
 # ---------------------------
 # Command Builder
@@ -536,6 +533,7 @@ def build_command():
 
     return cmd
 
+
 # ---------------------------
 # Log Reader Thread
 # ---------------------------
@@ -549,6 +547,7 @@ def read_output(process, log_queue):
                 break
     except Exception:
         pass
+
 
 # ---------------------------
 # Process Killing
@@ -613,6 +612,7 @@ def kill_port(port_num):
                         os.kill(int(pid), signal.SIGKILL)
             except Exception:
                 pass
+
 
 # ---------------------------
 # Server Start / Stop
@@ -709,6 +709,7 @@ def get_new_logs():
     except Exception:
         pass
     return new_logs
+
 
 # ---------------------------
 # Launch Controls
