@@ -101,7 +101,7 @@ with st.sidebar:
             f"**URL:** [{st.session_state.server_url}]({st.session_state.server_url})"
         )
         if st.button("🔗 Open URL", key="sidebar_open"):
-            webbrowser.open(st.session_state. server_url)
+            webbrowser.open(st.session_state.server_url)
     else:
         st.error("🔴 Server Stopped")
 
@@ -121,7 +121,7 @@ model_size = st.selectbox(
 
 # Language Selection
 language_keys = list(LANGUAGES.keys())
-language_index = 4  # default to german
+language_index = 4  # default to German
 language_display = st.selectbox(
     "Language",
     language_keys,
@@ -214,9 +214,9 @@ expert_defaults = {
     "model_cache_dir": "",
     "model_dir": "",
     "lora_path": "",
-    "warmup_file": "jfk.flac",
+    "warmup_file": "",  # TODO: currently none, should be either the standard jfk.wav or alternatively a custom warmup file tailored to our/your needs (your needs if you are a github user reading this, if so, welcome!)
     "buffer_trimming": "segment",
-    "buffer_trimming_sec": 15.0,
+    "buffer_trimming_sec": "",
     "confidence_validation": False,
     "no_vac": False,
     "no_vad": False,
@@ -224,16 +224,16 @@ expert_defaults = {
     "no_transcription": False,
     "punctuation_split": False,
     "diarization_backend": "sortformer",
-    "segmentation_model": "pyannote/segmentation-3.0",
-    "embedding_model": "pyannote/embedding",
-    "min_chunk_size": 0.1,
-    "vac_chunk_size": 0.04,
-    "frame_threshold": 25,
-    "beams": 1,
+    "segmentation_model": "",
+    "embedding_model": "",
+    "min_chunk_size": "",
+    "vac_chunk_size": "",
+    "frame_threshold": "",
+    "beams": "",
     "decoder_type": "auto",
-    "audio_max_len": 30.0,
-    "audio_min_len": 0.0,
-    "max_context_tokens": 175,
+    "audio_max_len": "",
+    "audio_min_len": "",
+    "max_context_tokens": 125,
     "disable_fast_encoder": False,
     "never_fire": False,
     "init_prompt": "",
@@ -241,9 +241,30 @@ expert_defaults = {
     "model_path": "",
     "cif_ckpt_path": "",
     "custom_alignment_heads": "",
-    "nllb_backend": "transformers",
-    "nllb_size": "600M",
+    "nllb_backend": "",
+    "nllb_size": "",
 }
+
+
+def to_float(value, default):
+    """Convert value to float; treat '' and None as 'empty' and use default."""
+    if value in ("", None):
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def to_int(value, default):
+    """Convert value to int; treat '' and None as 'empty' and use default."""
+    if value in ("", None):
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
 
 if st.session_state.show_expert_mode:
     st.warning(
@@ -294,11 +315,14 @@ if st.session_state.show_expert_mode:
                 "Buffer Trimming Strategy", buffer_options, index=0
             )
         with col2:
+            buffer_trimming_default = to_float(
+                expert_defaults.get("buffer_trimming_sec"), 15.0
+            )
             expert_defaults["buffer_trimming_sec"] = st.slider(
                 "Buffer Trimming Threshold (sec)",
                 1.0,
                 30.0,
-                expert_defaults["buffer_trimming_sec"],
+                buffer_trimming_default,
                 0.5,
             )
 
@@ -344,46 +368,53 @@ if st.session_state.show_expert_mode:
     with st.expander("🎵 Audio & Streaming", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
+            min_chunk_default = to_float(expert_defaults.get("min_chunk_size"), 0.25)
             expert_defaults["min_chunk_size"] = st.slider(
                 "Min Chunk Size (sec)",
                 0.01,
                 1.0,
-                expert_defaults["min_chunk_size"],
+                min_chunk_default,
                 0.01,
             )
         with col2:
+            vac_chunk_default = to_float(expert_defaults.get("vac_chunk_size"), 0.1)
             expert_defaults["vac_chunk_size"] = st.slider(
                 "VAC Chunk Size (sec)",
                 0.01,
                 0.2,
-                expert_defaults["vac_chunk_size"],
+                vac_chunk_default,
                 0.01,
             )
+
         col1, col2, col3 = st.columns(3)
         with col1:
+            frame_threshold_default = to_int(expert_defaults.get("frame_threshold"), 5)
             expert_defaults["frame_threshold"] = st.number_input(
-                "Frame Threshold", value=expert_defaults["frame_threshold"], min_value=1
+                "Frame Threshold", value=frame_threshold_default, min_value=1
             )
+            beams_default = to_int(expert_defaults.get("beams"), 1)
             expert_defaults["beams"] = st.number_input(
-                "Beams", value=expert_defaults["beams"], min_value=1
+                "Beams", value=beams_default, min_value=1
             )
             decoder_options = ["auto", "beam", "greedy"]
             expert_defaults["decoder_type"] = st.selectbox(
                 "Decoder Type", decoder_options, index=0
             )
         with col2:
+            audio_max_len_default = to_float(expert_defaults.get("audio_max_len"), 30.0)
             expert_defaults["audio_max_len"] = st.slider(
                 "Audio Max Length (sec)",
                 1.0,
                 60.0,
-                expert_defaults["audio_max_len"],
+                audio_max_len_default,
                 1.0,
             )
+            audio_min_len_default = to_float(expert_defaults.get("audio_min_len"), 0.0)
             expert_defaults["audio_min_len"] = st.slider(
                 "Audio Min Length (sec)",
                 0.0,
                 5.0,
-                expert_defaults["audio_min_len"],
+                audio_min_len_default,
                 0.1,
             )
             expert_defaults["max_context_tokens"] = st.number_input(
@@ -413,6 +444,12 @@ if st.session_state.show_expert_mode:
 # ---------------------------
 # Command Builder
 # ---------------------------
+def add_if_set(cmd, flag, value):
+    """Only add flag and value to cmd if value is not empty/None."""
+    if value not in ("", None):
+        cmd.extend([flag, str(value)])
+
+
 def build_command():
     cmd = [sys.executable, "-m", "improved_wlk_ui.server"]
     cmd.extend(["--host", expert_defaults["host"]])
@@ -433,7 +470,7 @@ def build_command():
         "OpenAI Whisper": "whisper",
         "OpenAI API": "openai-api",
     }
-    cmd.extend(["--backend", backend_map. get(backend, "auto")])
+    cmd.extend(["--backend", backend_map.get(backend, "auto")])
 
     optional_strings = [
         ("--ssl-certfile", expert_defaults["ssl_certfile"]),
@@ -461,9 +498,9 @@ def build_command():
 
     if enable_diarization:
         cmd.append("--diarization")
-        cmd.extend(["--diarization-backend", expert_defaults["diarization_backend"]])
-        cmd.extend(["--segmentation-model", expert_defaults["segmentation_model"]])
-        cmd.extend(["--embedding-model", expert_defaults["embedding_model"]])
+        add_if_set(cmd, "--diarization-backend", expert_defaults["diarization_backend"])
+        add_if_set(cmd, "--segmentation-model", expert_defaults["segmentation_model"])
+        add_if_set(cmd, "--embedding-model", expert_defaults["embedding_model"])
 
     flags = [
         "confidence_validation",
@@ -477,22 +514,22 @@ def build_command():
     ]
     for f in flags:
         if expert_defaults[f]:
-            cmd.append(f"--{f. replace('_', '-')}")
+            cmd.append(f"--{f.replace('_', '-')}")
 
-    cmd.extend(["--frame-threshold", str(expert_defaults["frame_threshold"])])
-    cmd.extend(["--beams", str(expert_defaults["beams"])])
-    if expert_defaults["decoder_type"] != "auto":
+    add_if_set(cmd, "--frame-threshold", expert_defaults["frame_threshold"])
+    add_if_set(cmd, "--beams", expert_defaults["beams"])
+    if expert_defaults["decoder_type"] not in ("auto", ""):
         cmd.extend(["--decoder", expert_defaults["decoder_type"]])
-    cmd.extend(["--audio-max-len", str(expert_defaults["audio_max_len"])])
-    cmd.extend(["--audio-min-len", str(expert_defaults["audio_min_len"])])
+    add_if_set(cmd, "--audio-max-len", expert_defaults["audio_max_len"])
+    add_if_set(cmd, "--audio-min-len", expert_defaults["audio_min_len"])
     if expert_defaults["max_context_tokens"] > 0:
         cmd.extend(["--max-context-tokens", str(expert_defaults["max_context_tokens"])])
-    cmd.extend(["--nllb-backend", expert_defaults["nllb_backend"]])
-    cmd.extend(["--nllb-size", expert_defaults["nllb_size"]])
-    cmd.extend(["--min-chunk-size", str(expert_defaults["min_chunk_size"])])
-    cmd.extend(["--vac-chunk-size", str(expert_defaults["vac_chunk_size"])])
-    cmd.extend(["--buffer_trimming", expert_defaults["buffer_trimming"]])
-    cmd.extend(["--buffer_trimming_sec", str(expert_defaults["buffer_trimming_sec"])])
+    add_if_set(cmd, "--nllb-backend", expert_defaults["nllb_backend"])
+    add_if_set(cmd, "--nllb-size", expert_defaults["nllb_size"])
+    add_if_set(cmd, "--min-chunk-size", expert_defaults["min_chunk_size"])
+    add_if_set(cmd, "--vac-chunk-size", expert_defaults["vac_chunk_size"])
+    add_if_set(cmd, "--buffer_trimming", expert_defaults["buffer_trimming"])
+    add_if_set(cmd, "--buffer_trimming_sec", expert_defaults["buffer_trimming_sec"])
 
     return cmd
 
@@ -503,7 +540,7 @@ def build_command():
 def read_output(process, log_queue):
     """Read process output in a separate thread."""
     try:
-        for line in iter(process.stdout. readline, ""):
+        for line in iter(process.stdout.readline, ""):
             if line:
                 log_queue.put(line.strip())
             if process.poll() is not None:
@@ -544,7 +581,7 @@ def kill_port(port_num):
             result = subprocess.run(
                 ["netstat", "-ano"], capture_output=True, text=True, timeout=10
             )
-            for line in result. stdout.split("\n"):
+            for line in result.stdout.split("\n"):
                 if f":{port_num}" in line and "LISTENING" in line:
                     parts = line.split()
                     if parts:
@@ -570,7 +607,7 @@ def kill_port(port_num):
                     text=True,
                     timeout=10,
                 )
-                for pid in result.stdout. strip().split("\n"):
+                for pid in result.stdout.strip().split("\n"):
                     if pid.isdigit():
                         os.kill(int(pid), signal.SIGKILL)
             except Exception:
@@ -587,7 +624,7 @@ def start_server():
     st.session_state.server_logs = []
 
     log_queue = queue.Queue()
-    st.session_state. log_queue = log_queue
+    st.session_state.log_queue = log_queue
 
     if os.name != "nt":
         process = subprocess.Popen(
@@ -608,14 +645,14 @@ def start_server():
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
         )
 
-    st.session_state. server_process = process
+    st.session_state.server_process = process
     st.session_state.server_pid = process.pid
     st.session_state.server_port = port
 
     log_thread = threading.Thread(
         target=read_output, args=(process, log_queue), daemon=True
     )
-    log_thread. start()
+    log_thread.start()
 
     return process, log_queue
 
@@ -624,31 +661,31 @@ def stop_server():
     """Stop the server - forcefully if needed."""
     stopped = False
 
-    if st.session_state. server_process is not None:
+    if st.session_state.server_process is not None:
         try:
             pid = st.session_state.server_process.pid
             kill_process_tree(pid)
             try:
-                st.session_state. server_process.wait(timeout=3)
+                st.session_state.server_process.wait(timeout=3)
                 stopped = True
             except subprocess.TimeoutExpired:
                 pass
 
-            if st.session_state. server_process.poll() is None:
+            if st.session_state.server_process.poll() is None:
                 try:
-                    st.session_state. server_process.kill()
-                    st.session_state. server_process.wait(timeout=2)
+                    st.session_state.server_process.kill()
+                    st.session_state.server_process.wait(timeout=2)
                     stopped = True
                 except Exception:
                     pass
         except Exception:
             pass
 
-    if st.session_state. server_port:
+    if st.session_state.server_port:
         kill_port(st.session_state.server_port)
         stopped = True
 
-    if st.session_state. server_pid:
+    if st.session_state.server_pid:
         kill_process_tree(st.session_state.server_pid)
         stopped = True
 
@@ -668,7 +705,7 @@ def get_new_logs():
         while not st.session_state.log_queue.empty():
             line = st.session_state.log_queue.get_nowait()
             new_logs.append(line)
-            st.session_state. server_logs.append(line)
+            st.session_state.server_logs.append(line)
     except Exception:
         pass
     return new_logs
@@ -698,7 +735,7 @@ if not st.session_state.server_running:
         status_placeholder = st.empty()
 
         server_ready = False
-        start_time = time. time()
+        start_time = time.time()
 
         while not server_ready:
             elapsed = int(time.time() - start_time)
@@ -707,7 +744,7 @@ if not st.session_state.server_running:
             try:
                 while not log_queue.empty():
                     line = log_queue.get_nowait()
-                    st.session_state. server_logs.append(line)
+                    st.session_state.server_logs.append(line)
 
                     recent_logs = st.session_state.server_logs[-15:]
                     log_placeholder.code("\n".join(recent_logs), language="text")
@@ -726,7 +763,7 @@ if not st.session_state.server_running:
                                 start_idx:end_idx
                             ].strip()
                         else:
-                            st.session_state. server_url = f"http://localhost:{port}"
+                            st.session_state.server_url = f"http://localhost:{port}"
                         break
             except Exception:
                 pass
@@ -789,7 +826,7 @@ else:
         cmd = build_command()
         st.code(" ".join(cmd), language="bash")
         if st.session_state.server_pid:
-            st.caption(f"Process ID (PID): {st.session_state. server_pid}")
+            st.caption(f"Process ID (PID): {st.session_state.server_pid}")
 
 # ---------------------------
 # Footer Help
@@ -800,7 +837,7 @@ with st.expander("ℹ️ Help"):
         """
 ### How to use
 1. Select model size (larger = more accurate but slower)
-2.  Choose the language being spoken
+2. Choose the language being spoken
 3. Enable translation if desired
 4. Review the command that will be executed
 5. Click **Start Transcription Server**
@@ -819,10 +856,10 @@ If the Stop button doesn't work, you can:
 - **Linux/Mac**: Run `pkill -f whisperlivekit` in terminal
 
 ### Notes
-- Expert mode allows advanced configuration - only change if you understand the options. 
-- Default translation is OFF. 
+- Expert mode allows advanced configuration - only change if you understand the options.
+- Default translation is OFF.
 - Server logs are displayed during startup and can be viewed while running.
-- Large models may take several minutes to load. 
+- Large models may take several minutes to load.
     """
     )
 
