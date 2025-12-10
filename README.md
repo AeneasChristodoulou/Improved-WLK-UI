@@ -31,7 +31,7 @@ pip install -e .
 The easiest way to use Improved WLK UI is through the Streamlit interface:
 
 ```bash
-streamlit run -m improved_wlk_ui.streamlit_app
+streamlit run streamlit_app.py
 ```
 
 This provides a user-friendly GUI to:
@@ -41,19 +41,32 @@ This provides a user-friendly GUI to:
 - Start and stop the server
 - View server logs in real-time
 
+It also sets quite a bunch of default values. They are all adjustable, currently inside of ```streamlit_app.py```.<br />
+The values are set to what I found works best for my usage scenario. Your milage may vary! <br />
+
+Hardware used to test this tool:
+HP ZBook Fury 16 G11 Workstation (Laptop)<br />
+GPU: NVIDIA RTX 4000 Ada Generation Laptop GPU (afaik equivalent to an RTX 4080?)<br />
+CPU: Intel Core i7 14700HX <br />
+RAM: 64GBs <br />
+
+I purposefully set the model to large-v3-turbo per default, as this is the best "bang for the buck" if you have decent hardware <br />
+If you have even more potent hardware or you live in a future where that specific issue has been fixed, feel free to change ```--max-context-tokens```. <br />
+I set it to ```125``` per default, as otherwise WLK with sortformer tended to loop and crash as well as get very slow due to filling the VRAM to the brim.
+
 ### Run the Enhanced Server Directly
 
 You can also run the enhanced server directly from the command line:
-
+```Nope you cannot right now! Since I dont use this myself I am also too lazy. Gotta find the issue with from .speaker_names import .... ```
 ```bash
 # Basic usage with speaker diarization
-improved-wlk-server --model large-v3-turbo --diarization
+python server.py --model large-v3-turbo --diarization
 
 # Custom port and host
-improved-wlk-server --model base --port 9000 --host 0.0.0.0
+python server.py--model base --port 8000 --host 192.168.0.42
 
 # With translation
-improved-wlk-server --model medium --language fr --target-language en
+python server.py --model medium --language fr --target-language en
 ```
 
 All standard WhisperLiveKit command-line options are supported.

@@ -37,5 +37,6 @@ class SpeakerNameManager:
 
 class SpeakerNameUpdate(BaseModel):
     """Pydantic model for speaker name update requests."""
+
     speaker_id: int
     name: str
