@@ -65,20 +65,6 @@ async def get():
     
     return HTMLResponse(html_content)
 
-
-@app.get("/web/{file_path:path}")
-async def serve_web_assets(file_path: str):
-    """Serve web assets (CSS, JS, images, etc.)."""
-    web_dir = Path(__file__).parent / "web"
-    file = web_dir / file_path
-    
-    if file.exists() and file.is_file():
-        return FileResponse(file)
-    
-    # If not found in our web dir, return 404
-    return HTMLResponse(content="Not Found", status_code=404)
-
-
 # Speaker Name API Endpoints
 @app.get("/api/speakers")
 async def get_speaker_names():
@@ -105,6 +91,18 @@ async def clear_all_speaker_names():
     """Clear all custom speaker names."""
     speaker_names.clear()
     return {"success": True}
+
+@app.get("/{file_path:path}")
+async def serve_web_assets(file_path: str):
+    """Serve web assets (CSS, JS, images, etc.)."""
+    web_dir = Path(__file__).parent / "web"
+    file = web_dir / file_path
+
+    if file.exists() and file.is_file():
+        return FileResponse(file)
+
+    # If not found in our web dir, return 404
+    return HTMLResponse(content="Not Found", status_code=404)
 
 
 async def handle_websocket_results(websocket, results_generator):
