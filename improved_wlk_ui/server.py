@@ -1,6 +1,9 @@
 """
-This server is based on the basic_server.py of "upstream" WhisperLiveKit. However, it is extended to include some further features.
-The main difference is, that this is standalone
+This server is based on the basic_server.py of "upstream" WhisperLiveKit. However, it is extended to include some further
+features.
+The main difference is, that this is a standalone implementation. No reliance on the upstream.
+Feature-wise there is a UI that enables you to give names to all differentiated voices identified by WLK. More features
+will be implemented at some point.
 """
 
 import asyncio

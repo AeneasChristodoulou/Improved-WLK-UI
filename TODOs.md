@@ -1,9 +1,9 @@
 # ToDo:
 ## Missing Features:
-- Add a Button for streamlit to kill itself cleanly
 - Add tests
 - Add a proper warmup file
 - Deliver better comments for the code
+- Put the default values etc. into a seperate config file
 
 ## Missing "Workflows"
 - Provide a proper way to start streamlit, not relying on the CLI. Since this is intended for windows a batch, shell, cmd or .exe as a file may be suitable to "launch" the interface amd open the browser
