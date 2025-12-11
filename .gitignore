@@ -131,6 +131,7 @@ nllb-200-distilled-600M-ctranslate2/*
 # WhisperLiveKit directory (installed as dependency)
 whisperlivekit/
 WhisperLiveKit/
+TODOs.md
 
 # Old files from restructuring
 pyproject_old.toml

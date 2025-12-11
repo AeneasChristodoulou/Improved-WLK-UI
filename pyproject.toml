@@ -13,9 +13,10 @@ authors = [
     {name = "Aeneas Christodoulou"}
 ]
 dependencies = [
-    "whisperlivekit>=0.2.15",
+    "whisperlivekit>=0.2.16",
     "streamlit>=1.28.0",
     "pydantic>=2.0.0",
+    "faster-whisper>=1.2.1"
 ]
 
 [project.optional-dependencies]
