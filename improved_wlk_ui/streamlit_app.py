@@ -74,8 +74,8 @@ MODEL_LIST = ["tiny", "base", "small", "medium", "large-v3", "large-v3-turbo"]
 
 BACKEND_OPTIONS = [
     "Auto",
-    "Faster-Whisper", # I'd recommend Faster-Whisper
-    "MLX-Whisper (Mac)", # unless you are on ARM Mac, then Use MLX, pretty nice from what I hear
+    "Faster-Whisper",  # I'd recommend Faster-Whisper
+    "MLX-Whisper (Mac)",  # unless you are on ARM Mac, then Use MLX, pretty nice from what I hear
     "OpenAI Whisper",
     "OpenAI API",
 ]
@@ -137,7 +137,7 @@ with col2:
 port = st.number_input(
     "Port",
     value=8000,
-    min_value=1024, # anything below would be criminally stupid
+    min_value=1024,  # anything below would be criminally stupid
     max_value=65535,
     help="Port number for the server",
 )
@@ -193,7 +193,7 @@ if st.button(
 # Default Values for the "expert mode"
 expert_defaults = {
     "host": "127.0.0.1",
-    "log_level": "INFO", # Set per default for "end users", can be changed to DEBUG etc. if necessary
+    "log_level": "INFO",  # Set per default for "end users", can be changed to DEBUG etc. if necessary
     "ssl_certfile": "",
     "ssl_keyfile": "",
     "forwarded_allow_ips": "",
@@ -210,7 +210,7 @@ expert_defaults = {
     "pcm_input": False,
     "no_transcription": False,
     "punctuation_split": False,
-    "diarization_backend": "sortformer", # Faster than AlignAtt as of December 2025
+    "diarization_backend": "sortformer",  # Faster than AlignAtt as of December 2025
     "segmentation_model": "",
     "embedding_model": "",
     "min_chunk_size": "",
@@ -220,7 +220,7 @@ expert_defaults = {
     "decoder_type": "auto",
     "audio_max_len": "",
     "audio_min_len": "",
-    "max_context_tokens": 125, # Varies on multiple parameters, this however works to prevent my 4080 Laptop equivalent from looping words in wlk
+    "max_context_tokens": 125,  # Varies on multiple parameters, this however works to prevent my 4080 Laptop equivalent from looping words in wlk
     "disable_fast_encoder": False,
     "never_fire": False,
     "init_prompt": "",
@@ -428,7 +428,6 @@ if st.session_state.show_expert_mode:
             )
 
 
-
 # Command building "backend"
 def add_if_set(cmd, flag, value):
     """Only add flag and value to cmd if value is not empty/None."""
@@ -520,7 +519,6 @@ def build_command():
     return cmd
 
 
-
 # Log Reader Thread
 def read_output(process, log_queue):
     # Read process output in a separate thread
@@ -532,7 +530,6 @@ def read_output(process, log_queue):
                 break
     except Exception:
         pass
-
 
 
 # Process Killing
