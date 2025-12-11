@@ -1,7 +1,9 @@
 """
-🎙️ WhisperLiveKit Streamlit Launcher
+WhisperLiveKit Streamlit Launcher
 Simple interface to start WhisperLiveKit transcription server.
 """
+
+# In case you are looking for that stupid mic emoji: 🎙️ - there you go!
 
 import streamlit as st
 import subprocess
@@ -13,14 +15,10 @@ import webbrowser
 import threading
 import queue
 
-# ---------------------------
 # Streamlit Page Configuration
-# ---------------------------
 st.set_page_config(page_title="WhisperLiveKit", page_icon="🎙️", layout="centered")
 
-# ---------------------------
 # Session State Initialization
-# ---------------------------
 if "server_process" not in st.session_state:
     st.session_state.server_process = None
 if "server_running" not in st.session_state:
@@ -38,9 +36,7 @@ if "log_queue" not in st.session_state:
 if "server_pid" not in st.session_state:
     st.session_state.server_pid = None
 
-# ---------------------------
-# Constants
-# ---------------------------
+# Constants (not the city!)
 LANGUAGES = {
     "Auto-detect": "auto",
     "English": "en",
@@ -78,21 +74,17 @@ MODEL_LIST = ["tiny", "base", "small", "medium", "large-v3", "large-v3-turbo"]
 
 BACKEND_OPTIONS = [
     "Auto",
-    "Faster-Whisper",
-    "MLX-Whisper (Mac)",
+    "Faster-Whisper",  # I'd recommend Faster-Whisper
+    "MLX-Whisper (Mac)",  # unless you are on ARM Mac, then Use MLX, pretty nice from what I hear
     "OpenAI Whisper",
     "OpenAI API",
 ]
 
-# ---------------------------
 # UI Header
-# ---------------------------
 st.title("🎙️ WhisperLiveKit")
 st.caption("Real-time speech transcription")
 
-# ---------------------------
 # Sidebar: Server Status
-# ---------------------------
 with st.sidebar:
     st.header("Status")
     if st.session_state.server_running and st.session_state.server_url:
@@ -105,13 +97,11 @@ with st.sidebar:
     else:
         st.error("🔴 Server Stopped")
 
-# ---------------------------
 # Configuration
-# ---------------------------
 st.header("⚙️ Configuration")
 
 # Model Selection
-model_index = 5  # default to "large-v3-turbo"
+model_index = 5  # default to "large-v3-turbo", nice for high accuracy, needs quite some compute tho
 model_size = st.selectbox(
     "Model",
     MODEL_LIST,
@@ -121,7 +111,7 @@ model_size = st.selectbox(
 
 # Language Selection
 language_keys = list(LANGUAGES.keys())
-language_index = 4  # default to German
+language_index = 4  # defaults to German, TODO: REALLY MAKE THIS A CONFIG FILE! WHO WANTS THIS TO DEFAULT TO GERMAN (besides my usecase)?!?!?!?!?
 language_display = st.selectbox(
     "Language",
     language_keys,
@@ -130,7 +120,7 @@ language_display = st.selectbox(
 )
 language = LANGUAGES[language_display]
 
-# Features
+# Features (woo, shiny!)
 col1, col2 = st.columns(2)
 with col1:
     enable_translate = st.checkbox(
@@ -143,11 +133,11 @@ with col2:
         help="Identify different speakers (requires additional setup)",
     )
 
-# Port
+# Port number
 port = st.number_input(
     "Port",
     value=8000,
-    min_value=1024,
+    min_value=1024,  # anything below would be criminally stupid
     max_value=65535,
     help="Port number for the server",
 )
@@ -167,9 +157,7 @@ with st.expander("🔧 Advanced Options"):
         help="Auto selects the best available backend",
     )
 
-# ---------------------------
 # Translation Menu
-# ---------------------------
 st.subheader("🌐 Translation")
 translation_mode = st.selectbox(
     "Translation Mode",
@@ -193,9 +181,8 @@ elif translation_mode == "Translate to Specific Language":
     )
     target_language_override = LANGUAGES[target_language_override_display]
 
-# ---------------------------
-# Expert Mode
-# ---------------------------
+
+# "Expert" Mode (lol)
 st.divider()
 if st.button(
     "⚠️ Expert Mode - Only if you know what you're doing!", use_container_width=True
@@ -203,10 +190,10 @@ if st.button(
     st.session_state.show_expert_mode = not st.session_state.show_expert_mode
     st.rerun()
 
-# Default Expert Values
+# Default Values for the "expert mode"
 expert_defaults = {
     "host": "127.0.0.1",
-    "log_level": "INFO",
+    "log_level": "INFO",  # Set per default for "end users", can be changed to DEBUG etc. if necessary
     "ssl_certfile": "",
     "ssl_keyfile": "",
     "forwarded_allow_ips": "",
@@ -214,7 +201,7 @@ expert_defaults = {
     "model_cache_dir": "",
     "model_dir": "",
     "lora_path": "",
-    "warmup_file": "",  # TODO: currently none, should be either the standard jfk.wav or alternatively a custom warmup file tailored to our/your needs (your needs if you are a github user reading this, if so, welcome!)
+    "warmup_file": "",  # TODO: currently none, should be either the standard jfk.wav or alternatively a custom warmup file tailored to our/your needs (your needs if you are a github user reading this, if so, welcome!). Maybe make this a selectable thing!
     "buffer_trimming": "segment",
     "buffer_trimming_sec": "",
     "confidence_validation": False,
@@ -223,7 +210,7 @@ expert_defaults = {
     "pcm_input": False,
     "no_transcription": False,
     "punctuation_split": False,
-    "diarization_backend": "sortformer",
+    "diarization_backend": "sortformer",  # Faster than AlignAtt as of December 2025
     "segmentation_model": "",
     "embedding_model": "",
     "min_chunk_size": "",
@@ -233,7 +220,7 @@ expert_defaults = {
     "decoder_type": "auto",
     "audio_max_len": "",
     "audio_min_len": "",
-    "max_context_tokens": 125,
+    "max_context_tokens": 125,  # Varies on multiple parameters, this however works to prevent my 4080 Laptop equivalent from looping words in wlk
     "disable_fast_encoder": False,
     "never_fire": False,
     "init_prompt": "",
@@ -247,7 +234,7 @@ expert_defaults = {
 
 
 def to_float(value, default):
-    """Convert value to float; treat '' and None as 'empty' and use default."""
+    # Convert value to float; treat '' and None as 'empty' and use default
     if value in ("", None):
         return default
     try:
@@ -257,7 +244,7 @@ def to_float(value, default):
 
 
 def to_int(value, default):
-    """Convert value to int; treat '' and None as 'empty' and use default."""
+    # Convert value to int; treat '' and None as 'empty' and use default
     if value in ("", None):
         return default
     try:
@@ -441,9 +428,7 @@ if st.session_state.show_expert_mode:
             )
 
 
-# ---------------------------
-# Command Builder
-# ---------------------------
+# Command building "backend"
 def add_if_set(cmd, flag, value):
     """Only add flag and value to cmd if value is not empty/None."""
     if value not in ("", None):
@@ -534,11 +519,9 @@ def build_command():
     return cmd
 
 
-# ---------------------------
 # Log Reader Thread
-# ---------------------------
 def read_output(process, log_queue):
-    """Read process output in a separate thread."""
+    # Read process output in a separate thread
     try:
         for line in iter(process.stdout.readline, ""):
             if line:
@@ -549,11 +532,9 @@ def read_output(process, log_queue):
         pass
 
 
-# ---------------------------
 # Process Killing
-# ---------------------------
 def kill_process_tree(pid):
-    """Kill a process and all its children.  Works on Windows and Unix."""
+    # Kill a process and all its children. Works on Windows and Unix (that sound too much like a genocide no?)
     if os.name == "nt":
         try:
             subprocess.run(
@@ -575,7 +556,7 @@ def kill_process_tree(pid):
 
 
 def kill_port(port_num):
-    """Kill any process using the specified port."""
+    # Kill any process using the specified port
     if os.name == "nt":
         try:
             result = subprocess.run(
@@ -618,7 +599,7 @@ def kill_port(port_num):
 # Server Start / Stop
 # ---------------------------
 def start_server():
-    """Start the server and return the process and log queue."""
+    # Start the server, return process and log queue
     cmd = build_command()
 
     st.session_state.server_logs = []
@@ -658,7 +639,7 @@ def start_server():
 
 
 def stop_server():
-    """Stop the server - forcefully if needed."""
+    # Stop the server - forcefully if needed
     stopped = False
 
     if st.session_state.server_process is not None:
@@ -699,7 +680,7 @@ def stop_server():
 
 
 def get_new_logs():
-    """Get any new logs from the queue."""
+    # Get any new logs from the queue
     new_logs = []
     try:
         while not st.session_state.log_queue.empty():
@@ -711,13 +692,11 @@ def get_new_logs():
     return new_logs
 
 
-# ---------------------------
 # Launch Controls
-# ---------------------------
 st.divider()
 
 if not st.session_state.server_running:
-    # Show command preview before starting
+    # Enable command preview
     st.subheader("📋 Command to Execute")
     cmd = build_command()
     st.code(" ".join(cmd), language="bash")
@@ -828,31 +807,46 @@ else:
         if st.session_state.server_pid:
             st.caption(f"Process ID (PID): {st.session_state.server_pid}")
 
-# ---------------------------
-# Footer Help
-# ---------------------------
 st.divider()
+
+# Terminate the entire streamlit app
+if st.button("Terminate Streamlit App"):
+    if st.session_state.server_running:
+        st.write("Server still running. Terminating...")
+        stop_server()
+        time.sleep(1)
+        st.write("Server stopped.")
+    st.write("Terminating Streamlit app...")
+    time.sleep(1)
+    os._exit(0)
+
+
+st.divider()
+
+# Help in the footer
 with st.expander("ℹ️ Help"):
     st.markdown(
         """
 ### How to use
 1. Select model size (larger = more accurate but slower)
-2. Choose the language being spoken
-3. Enable translation if desired
-4. Review the command that will be executed
+2. Choose the language being spoken (or set it to auto detect languages)
+3. Enable translation if desired (may require more setup than "pure" transcription and diarization)
+4. Review the command that will be executed (you can adjust the other parameters using the "expert mode"
 5. Click **Start Transcription Server**
 6. Wait for the server to start (you'll see logs)
 7. Open the provided URL in your browser
 
 ### Model Recommendations
-- **tiny/base**: Fast, good for real-time
-- **small/medium**: More accurate
-- **large-v3 / large-v3-turbo**: Very accurate, slower
+- **tiny/base**: Fast and lower compute, unfortunately poor accuracy.
+- **small/medium**: More accurate, decent middleground
+- **large-v2 / large-v3**: Way more accurate but also way slower
+- **large-v3-turbo**: A tiny bit less precise than the aforementioned but way faster (yet slower than medium)
+If you have enough compute, use large-v3 or large-v3-turbo. If not, try the others.
+As of December 2025, I would highly recommend setting --max-context-tokens lower if you are still experiencing issues with crashes / loops
 
 ### Stopping the Server
 If the Stop button doesn't work, you can:
 - **Windows**: Open Task Manager, find `python.exe` and end the task
-- **Windows**: Run `taskkill /F /IM python.exe` in Command Prompt
 - **Linux/Mac**: Run `pkill -f whisperlivekit` in terminal
 
 ### Notes

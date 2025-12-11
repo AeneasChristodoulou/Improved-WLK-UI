@@ -1,8 +1,9 @@
 """
-Extended WhisperLiveKit server with speaker name management.
-
-This module provides an enhanced FastAPI server that extends the base WhisperLiveKit
-functionality with speaker name management capabilities.
+This server is based on the basic_server.py of "upstream" WhisperLiveKit. However, it is extended to include some further
+features.
+The main difference is, that this is a standalone implementation. No reliance on the upstream.
+Feature-wise there is a UI that enables you to give names to all differentiated voices identified by WLK. More features
+will be implemented at some point.
 """
 
 import asyncio
@@ -11,8 +12,8 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from whisperlivekit import (
     AudioProcessor,
