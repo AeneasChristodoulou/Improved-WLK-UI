@@ -1,3 +1,14 @@
+// This file is derived from https://github.com/QuentinFuxa/WhisperLiveKit
+// and has been modified.
+// See NOTICE and LICENSE for further details.
+//
+// Copyright 2025 Quentin Fuxa
+// (Original work)
+//
+// Modifications Copyright 2025 Aeneas Christodoulou
+// SPDX-License-Identifier: Apache-2.0
+
+
 const isExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL;
 if (isExtension) {
   document.documentElement.classList.add('is-extension');

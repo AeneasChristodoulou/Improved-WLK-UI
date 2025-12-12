@@ -1,17 +1,18 @@
 # Improved WLK UI
 
-Enhanced UI and speaker name management for WhisperLiveKit.
+Enhanced UI and speaker name management for WhisperLiveKit. Exposes all Options from the Terminal in a streamlit-based GUI.<br/>
+Developed by a backend-dude for end users, not too pretty but decent and functional. 
 
 ## Features
 
 - **Streamlit-based GUI** for easy server configuration and launching
 - **Custom speaker name assignment** - map "Speaker 1" → "Alice", "Speaker 2" → "Bob", etc.
-- **Speaker names persist** and display in real-time transcription
+- **Speaker names persist** and display in real-time live transcription
 - **Extended REST API** for managing speaker names programmatically
 - **Full WhisperLiveKit compatibility** - uses WhisperLiveKit as a dependency
 
 ## Installation
-
+~~Use pip~~ **_(to be implemented):_**
 ```bash
 pip install improved-wlk-ui
 ```
@@ -54,9 +55,9 @@ I purposefully set the model to large-v3-turbo per default, as this is the best 
 If you have even more potent hardware or you live in a future where that specific issue has been fixed, feel free to change ```--max-context-tokens```. <br />
 I set it to ```125``` per default, as otherwise WLK with sortformer tended to loop and crash as well as get very slow due to filling the VRAM to the brim.
 
-### Run the Enhanced Server Directly
+### ~~Run the Enhanced Server Directly~~
 
-You can also run the enhanced server directly from the command line:
+~~You can also run the enhanced server directly from the command line:~~
 ```Nope you cannot right now! Since I dont use this myself I am also too lazy. Gotta find the issue with from .speaker_names import .... ```
 ```bash
 # Basic usage with speaker diarization
@@ -85,12 +86,12 @@ You'll see the enhanced WhisperLiveKit interface with the speaker name editor bu
 
 1. **Click the "👤 Speakers" button** in the web interface to open the speaker name editor
 2. **Add custom names** for each speaker ID (e.g., Speaker 1 → "Alice")
-3. **Save** your changes - names will persist for the duration of the server session
-4. **View in transcript** - speaker names will appear automatically in the live transcription
+3. **Save** your changes, names will persist for the duration of the server session
+4. **See it in action** - speaker names will appear automatically in the live transcription. No reload required!
 
 ## API Endpoints
 
-The enhanced server provides REST API endpoints for managing speaker names:
+The Improved WLK UI server provides REST API endpoints for managing speaker names:
 
 ### Get all speaker names
 
@@ -108,7 +109,7 @@ Response:
 }
 ```
 
-### Set a speaker name
+### Set a new speaker name
 
 ```bash
 curl -X POST http://localhost:8000/api/speakers \
@@ -138,9 +139,16 @@ Improved WLK UI extends WhisperLiveKit by:
 4. **Enhancing WebSocket responses** to include `speaker_name` alongside `speaker` ID
 5. **Providing a Streamlit GUI** for easy configuration and server management
 
+## TL;DR
+This repo provides standalone UI Improvements to WhisperLiveKit. Namely, you can add custom names to all detected Speakers <br/>
+and there is a GUI based on streamlit for end users to easily launch and configure the tool. <br/>
+It only provides the relevant files needed to improve the UI/UX. You still need to install and setup WhisperLiveKit. <br/>
+
+For a link to QuentinFuxa/WhisperLiveKit see "Credits".
+
 ## Development
 
-To contribute or modify the code:
+To contribute or modify the code, install from source:
 
 ```bash
 git clone https://github.com/AeneasChristodoulou/Improved-WLK-UI.git

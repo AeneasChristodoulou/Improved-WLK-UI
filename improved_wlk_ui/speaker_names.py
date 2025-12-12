@@ -1,4 +1,12 @@
 """
+Copyright 2025 Aeneas Christodoulou
+SPDX-License-Identifier: Apache-2.0
+
+See LICENSE and NOTICE for further details.
+"""
+
+
+"""
 Speaker name management for WhisperLiveKit.
 
 This module provides functionality to map numeric speaker IDs to custom names.

@@ -1,4 +1,16 @@
 """
+This file is derived from https://github.com/QuentinFuxa/WhisperLiveKit and has been modified.
+See NOTICE and LICENSE for further details.
+
+Copyright 2025 Quentin Fuxa
+(Original work)
+
+Modifications Copyright 2025 xxxx
+SPDX-License-Identifier: Apache-2.0
+"""
+
+
+"""
 This server is based on the basic_server.py of "upstream" WhisperLiveKit. However, it is extended to include some further
 features.
 The main difference is, that this is a standalone implementation. No reliance on the upstream.

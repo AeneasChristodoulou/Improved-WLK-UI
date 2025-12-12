@@ -1,3 +1,15 @@
+/*
+This file is derived from https://github.com/QuentinFuxa/WhisperLiveKit
+and has been modified.
+See NOTICE and LICENSE for further details.
+
+Copyright 2025 Quentin Fuxa
+(Original work)
+
+Modifications Copyright 2025 Aeneas Christodoulou
+SPDX-License-Identifier: Apache-2.0
+*/
+
 :root {
   --bg: #ffffff;
   --text: #111111;

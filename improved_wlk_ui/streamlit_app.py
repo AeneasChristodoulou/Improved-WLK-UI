@@ -1,7 +1,13 @@
 """
+Copyright 2025 Aeneas Christodoulou
+SPDX-License-Identifier: Apache-2.0
+
+See LICENSE and NOTICE for further details.
+
 WhisperLiveKit Streamlit Launcher
 Simple interface to start WhisperLiveKit transcription server.
 """
+
 
 # In case you are looking for that stupid mic emoji: 🎙️ - there you go!
 
@@ -79,12 +85,11 @@ BACKEND_OPTIONS = [
     "OpenAI Whisper",
     "OpenAI API",
 ]
-
 # UI Header
 st.title("🎙️ WhisperLiveKit")
 st.caption("Real-time speech transcription")
 
-# Sidebar: Server Status
+# Sidebar: Server Status (running/stopped)
 with st.sidebar:
     st.header("Status")
     if st.session_state.server_running and st.session_state.server_url:

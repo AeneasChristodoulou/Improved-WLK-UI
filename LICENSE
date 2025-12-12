@@ -201,7 +201,7 @@
    limitations under the License.
 ---
 
-## Based on:
+## "Upstream" WhisperLiveKit is based on:
 - **SimulWhisper** by Speech and Audio Technology LAB of Tsinghua University – Apache-2.0 – https://github.com/ufal/SimulStreaming
 - **SimulStreaming** by ÚFAL – MIT License – https://github.com/ufal/SimulStreaming
 - **NeMo** by NVidia - Apache-2.0 - https://github.com/NVIDIA-NeMo/NeMo 
