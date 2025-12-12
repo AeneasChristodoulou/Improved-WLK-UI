@@ -7,7 +7,7 @@ Copyright 2025 Quentin Fuxa
 
 Modifications Copyright 2025 xxxx
 SPDX-License-Identifier: Apache-2.0
-"""
+py"""
 
 
 """
@@ -33,7 +33,7 @@ from whisperlivekit import (
     parse_args,
 )
 
-from .speaker_names import SpeakerNameManager, SpeakerNameUpdate
+from .speaker_names import SpeakerNameManager, SpeakerNameUpdate # TODO: This blocks running server.py directly form terminal, investigate!
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
